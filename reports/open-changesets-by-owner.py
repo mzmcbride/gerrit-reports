@@ -2,10 +2,8 @@
 # Public domain; MZMcBride; 2013
 
 import ConfigParser
-import json
 import os
 import sqlite3
-import urllib2
 
 import wikitools
 
