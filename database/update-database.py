@@ -11,9 +11,9 @@ config = ConfigParser.ConfigParser()
 config.read([os.path.expanduser('~/.gerrit-reports.ini')])
 
 database_name = config.get('gerrit-reports', 'database_name')
-base_url = config.get('gerrit-reports', 'base_url')
+gerrit_api_url = config.get('gerrit-reports', 'gerrit_api_url')
 
-def get_changes(base_url, status, sortkey):
+def get_changes(gerrit_api_url, status, sortkey):
     changes = []
     more_changes = False
     if sortkey:
@@ -24,7 +24,7 @@ def get_changes(base_url, status, sortkey):
     opener = urllib2.build_opener()
     # Set a user agent to avoid an "Authentication required" error
     opener.addheaders = [('User-Agent', 'gerrit-reports')]
-    url_contents = opener.open(base_url+'changes/' + params).read()
+    url_contents = opener.open(gerrit_api_url+'changes/' + params).read()
     # Strip first five bytes to avoid an XSSI protection
     valid_json = url_contents[5:]
     loaded_json = json.loads(valid_json)
@@ -38,12 +38,12 @@ def get_changes(base_url, status, sortkey):
         changes.append(i)
     return changes, sortkey
 
-def get_cumulative_changes(base_url, status):
+def get_cumulative_changes(gerrit_api_url, status):
     sortkey = ''
     sortkeys = []
     cumulative_changes = []
     while True:
-        changes, sortkey = get_changes(base_url, status, sortkey)
+        changes, sortkey = get_changes(gerrit_api_url, status, sortkey)
         cumulative_changes += changes
         if sortkey in sortkeys:
             break
@@ -61,7 +61,7 @@ for status in ['abandoned',
                'open',
                'reviewed',
                'submitted']:
-    cumulative_changes = get_cumulative_changes(base_url, status)
+    cumulative_changes = get_cumulative_changes(gerrit_api_url, status)
     total_changes += cumulative_changes
 
 conn = sqlite3.connect(database_name)
