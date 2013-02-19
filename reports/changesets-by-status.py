@@ -11,7 +11,6 @@ config = ConfigParser.ConfigParser()
 config.read([os.path.expanduser('~/.gerrit-reports.ini')])
 
 database_name = config.get('gerrit-reports', 'database_name')
-gerrit_api_url = config.get('gerrit-reports', 'gerrit_api_url')
 wiki_api_url = config.get('gerrit-reports', 'wiki_api_url')
 root_page = config.get('gerrit-reports', 'wiki_root_page')
 
