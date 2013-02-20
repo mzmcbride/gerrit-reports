@@ -22,8 +22,9 @@ Merged changesets wed to unresolved bugs.
 
 {| class="wikitable sortable plainlinks"
 |- style="white-space:nowrap;"
-! Changeset
 ! Bug
+! Subject
+! Changeset
 %s
 |}
 '''
@@ -81,11 +82,13 @@ for row in db_query_results:
         if int(match.group(2)) in open_bugs:
             table_row = u"""\
 |-
-| [[gerrit:%s|%s]]
-| [[bugzilla:%s|%s]]""" % (gc_number,
-                           gc_number,
-                           match.group(2),
-                           match.group(2))
+| [[bugzilla:%s|%s]]
+| <nowiki>%s</nowiki>
+| [[gerrit:%s|%s]]""" % (match.group(2),
+                         match.group(2),
+                         gc_subject,
+                         gc_number,
+                         gc_number)
             output.append(table_row)
 
 wiki = wikitools.Wiki(config.get('gerrit-reports', 'wiki_api_url'))
