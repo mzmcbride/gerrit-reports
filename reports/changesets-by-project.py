@@ -100,8 +100,8 @@ new_total = 0
 submitted_total = 0
 for row in sorted_rows:
     abandoned_total += row[1]
-    merged_total += row[3]
-    new_total += row[2]
+    merged_total += row[2]
+    new_total += row[3]
     submitted_total += row[4]
     project_url = u'[https://gerrit.wikimedia.org/r/#/q/' + \
                   u'project:%s,n,z %s]' % (row[0], row[0])
@@ -116,8 +116,8 @@ for row in sorted_rows:
 | %s
 | %s""" % (project_url,
            project_status_url % (row[0], 'abandoned', row[1]),
-           project_status_url % (row[0], 'merged', row[3]),
-           project_status_url % (row[0], 'open', row[2]),
+           project_status_url % (row[0], 'merged', row[2]),
+           project_status_url % (row[0], 'open', row[3]),
            project_status_url % (row[0], 'submitted', row[4]),
            row[5])
     output.append(table_row)
