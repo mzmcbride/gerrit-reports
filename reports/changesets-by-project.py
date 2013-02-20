@@ -23,8 +23,8 @@ Changesets by project.
 |- style="white-space:nowrap;"
 ! Project
 ! Abandoned
-! New
 ! Merged
+! New
 ! Submitted
 ! Total
 %s
@@ -71,23 +71,23 @@ for project, statuses in projects.iteritems():
     except KeyError:
         abandoned = 0
     try:
-        new = statuses[u'NEW']
-    except KeyError:
-        new = 0
-    try:
         merged = statuses[u'MERGED']
     except KeyError:
         merged = 0
     try:
+        new = statuses[u'NEW']
+    except KeyError:
+        new = 0
+    try:
         submitted = statuses[u'SUBMITTED']
     except KeyError:
         submitted = 0
-    row_total = abandoned+new+merged+submitted
+    row_total = abandoned+merged+new+submitted
     grand_total += row_total
     rows.append([project,
                  abandoned,
-                 new,
                  merged,
+                 new,
                  submitted,
                  row_total])
 
@@ -95,13 +95,13 @@ sorted_rows = sorted(rows, key=operator.itemgetter(0))
 
 output = []
 abandoned_total = 0
-new_total = 0
 merged_total = 0
+new_total = 0
 submitted_total = 0
 for row in sorted_rows:
     abandoned_total += row[1]
-    new_total += row[2]
     merged_total += row[3]
+    new_total += row[2]
     submitted_total += row[4]
     project_url = u'[https://gerrit.wikimedia.org/r/#/q/' + \
                   u'project:%s,n,z %s]' % (row[0], row[0])
@@ -116,8 +116,8 @@ for row in sorted_rows:
 | %s
 | %s""" % (project_url,
            project_status_url % (row[0], 'abandoned', row[1]),
-           project_status_url % (row[0], 'open', row[2]),
            project_status_url % (row[0], 'merged', row[3]),
+           project_status_url % (row[0], 'open', row[2]),
            project_status_url % (row[0], 'submitted', row[4]),
            row[5])
     output.append(table_row)
@@ -129,8 +129,8 @@ wiki.login(config.get('gerrit-reports', 'wiki_username'),
 report = wikitools.Page(wiki, report_title)
 report_text = report_template % ('\n'.join(output),
                                  abandoned_total,
-                                 new_total,
                                  merged_total,
+                                 new_total,
                                  submitted_total,
                                  grand_total)
 report_text = report_text.encode('utf-8')
