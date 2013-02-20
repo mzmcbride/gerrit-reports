@@ -1,0 +1,7 @@
+Gerrit reports.
+
+Dependencies:
+* Python
+** wikitools module (<https://code.google.com/p/python-wikitools/>)
+
+License information is available in the LICENSE file.
