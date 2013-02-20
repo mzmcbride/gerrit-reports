@@ -19,7 +19,7 @@ report_title = root_page + 'Changesets by project'
 report_template = u'''\
 Changesets by project.
 
-{| class="wikitable sortable"
+{| class="wikitable sortable plainlinks"
 |- style="white-space:nowrap;"
 ! Project
 ! Abandoned
@@ -103,6 +103,10 @@ for row in sorted_rows:
     new_total += row[2]
     merged_total += row[3]
     submitted_total += row[4]
+    project_url = u'[https://gerrit.wikimedia.org/r/#/q/' + \
+                  u'project:%s,n,z %s]' % (row[0], row[0])
+    project_status_url = u'[https://gerrit.wikimedia.org/r/#/q/' + \
+                         u'project:%s+status:%s,n,z %s]'
     table_row = u"""\
 |-
 | %s
@@ -110,7 +114,12 @@ for row in sorted_rows:
 | %s
 | %s
 | %s
-| %s""" % (row[0], row[1], row[2], row[3], row[4], row[5])
+| %s""" % (project_url,
+           project_status_url % (row[0], 'abandoned', row[1]),
+           project_status_url % (row[0], 'open', row[2]),
+           project_status_url % (row[0], 'merged', row[3]),
+           project_status_url % (row[0], 'submitted', row[4]),
+           row[5])
     output.append(table_row)
 
 wiki = wikitools.Wiki(config.get('gerrit-reports', 'wiki_api_url'))
