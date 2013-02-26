@@ -23,6 +23,9 @@ Open changesets by owner.
 ! Owner
 ! Changesets
 %s
+|- class="sortbottom"
+! Total
+! %s
 |}
 '''
 
@@ -38,19 +41,21 @@ GROUP BY gc_owner;
 ''')
 
 output = []
+total = 0
 for row in cursor.fetchall():
     table_row = u"""\
 |-
 | [https://gerrit.wikimedia.org/r/#/q/owner:%%22{{urlencode:%s}}%%22+status:open,n,z %s]
 | %s""" % (row[0], row[0], row[1])
     output.append(table_row)
+    total += int(row[1])
 
 wiki = wikitools.Wiki(config.get('gerrit-reports', 'wiki_api_url'))
 wiki.login(config.get('gerrit-reports', 'wiki_username'),
            config.get('gerrit-reports', 'wiki_password'))
 
 report = wikitools.Page(wiki, report_title)
-report_text = report_template % ('\n'.join(output))
+report_text = report_template % ('\n'.join(output), total)
 report_text = report_text.encode('utf-8')
 report.edit(report_text,
             summary=config.get('gerrit-reports', 'wiki_edit_summary'),
