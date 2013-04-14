@@ -4,4 +4,7 @@ Dependencies:
 * Python
 ** wikitools module (<https://code.google.com/p/python-wikitools/>)
 
+Fill out the gerrit-reports.ini.sample file appropriately and move it to the
+equivalent of os.path.expanduser('~') with the name ".gerrit-reports.ini".
+
 License information is available in the LICENSE file.
