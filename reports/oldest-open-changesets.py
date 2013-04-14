@@ -21,6 +21,7 @@ Oldest open changesets.
 {| class="wikitable sortable"
 |- style="white-space:nowrap;"
 ! Changeset
+! Project
 ! Created
 ! Owner
 %s
@@ -32,12 +33,13 @@ cursor = conn.cursor()
 cursor.execute('''
 SELECT
   gc_number,
+  gc_project,
   gc_created,
   gc_owner
 FROM changesets
 WHERE gc_status = 'NEW'
 ORDER BY gc_created ASC
-LIMIT 100;
+LIMIT 200;
 ''')
 
 output = []
@@ -46,7 +48,8 @@ for row in cursor.fetchall():
 |-
 | [[gerrit:%s|%s]]
 | %s
-| %s""" % (row[0], row[0], row[1].split(' ', 1)[0], row[2])
+| %s
+| %s""" % (row[0], row[0], row[1], row[2].split(' ', 1)[0], row[3])
     output.append(table_row)
 
 wiki = wikitools.Wiki(config.get('gerrit-reports', 'wiki_api_url'))
