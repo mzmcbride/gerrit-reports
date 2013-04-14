@@ -16,7 +16,7 @@ root_page = config.get('gerrit-reports', 'wiki_root_page')
 
 report_title = root_page + 'Changesets by status'
 report_template = u'''\
-Changesets by status.
+%s
 
 {| class="wikitable sortable"
 |- style="white-space:nowrap;"
@@ -27,6 +27,8 @@ Changesets by status.
 ! Total
 ! %s
 |}
+
+%s
 '''
 
 conn = sqlite3.connect(database_name)
@@ -54,7 +56,12 @@ wiki.login(config.get('gerrit-reports', 'wiki_username'),
            config.get('gerrit-reports', 'wiki_password'))
 
 report = wikitools.Page(wiki, report_title)
-report_text = report_template % ('\n'.join(output), total)
+report_text = report_template % (config.get('gerrit-reports',
+                                            'wiki_header_template'),
+                                 '\n'.join(output),
+                                 total,
+                                 config.get('gerrit-reports',
+                                            'wiki_footer_template'))
 report_text = report_text.encode('utf-8')
 report.edit(report_text,
             summary=config.get('gerrit-reports', 'wiki_edit_summary'),

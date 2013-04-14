@@ -18,7 +18,7 @@ root_page = config.get('gerrit-reports', 'wiki_root_page')
 
 report_title = root_page + 'Merged changesets wed to unresolved bugs'
 report_template = u'''\
-Merged changesets wed to unresolved bugs.
+%s
 
 {| class="wikitable sortable plainlinks"
 |- style="white-space:nowrap;"
@@ -27,6 +27,8 @@ Merged changesets wed to unresolved bugs.
 ! Changeset
 %s
 |}
+
+%s
 '''
 
 def get_open_bugs():
@@ -96,7 +98,11 @@ wiki.login(config.get('gerrit-reports', 'wiki_username'),
            config.get('gerrit-reports', 'wiki_password'))
 
 report = wikitools.Page(wiki, report_title)
-report_text = report_template % ('\n'.join(output))
+report_text = report_template % (config.get('gerrit-reports',
+                                            'wiki_header_template'),
+                                 '\n'.join(output),
+                                 config.get('gerrit-reports',
+                                            'wiki_footer_template'))
 report_text = report_text.encode('utf-8')
 report.edit(report_text,
             summary=config.get('gerrit-reports', 'wiki_edit_summary'),
