@@ -53,12 +53,16 @@ open_total = 0
 open_mediawiki = 0
 open_core = 0
 for row in cursor.fetchall():
-    table_row = u"""\
+    table_row = u"""
 |-
-| [https://gerrit.wikimedia.org/r/#/q/owner:%%22{{urlencode:%s}}%%22+status:open,n,z %s]
 | %s
-| %s
-| %s""" % (row[0], row[0], row[1], row[2], row[3])
+| [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" status:open}},n,z %s]
+| [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:^mediawiki/.+ status:open}},n,z %s]
+| [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:mediawiki/core status:open}},n,z %s]
+""".strip() % (row[0],
+               row[0], row[1],
+               row[0], row[2],
+               row[0], row[3])
     output.append(table_row)
     open_total += int(row[1])
     open_mediawiki += int(row[2])
