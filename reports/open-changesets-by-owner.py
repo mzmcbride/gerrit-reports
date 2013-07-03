@@ -21,10 +21,14 @@ report_template = u'''\
 {| class="wikitable sortable plainlinks"
 |- style="white-space:nowrap;"
 ! Owner
-! Changesets
+! Changesets<br>(total)
+! Changesets<br>(mediawiki/*)
+! Changesets<br>(mediawiki/core)
 %s
 |- class="sortbottom"
 ! Total
+! %s
+! %s
 ! %s
 |}
 
@@ -36,21 +40,29 @@ cursor = conn.cursor()
 cursor.execute('''
 SELECT
   gc_owner,
-  COUNT(*)
+  COUNT(*) as open_total,
+  SUM( gc_project LIKE 'mediawiki/%' ) as open_mediawiki,
+  SUM( gc_project == 'mediawiki/core' ) as open_core
 FROM changesets
 WHERE gc_status = 'NEW'
 GROUP BY gc_owner;
 ''')
 
 output = []
-total = 0
+open_total = 0
+open_mediawiki = 0
+open_core = 0
 for row in cursor.fetchall():
     table_row = u"""\
 |-
 | [https://gerrit.wikimedia.org/r/#/q/owner:%%22{{urlencode:%s}}%%22+status:open,n,z %s]
-| %s""" % (row[0], row[0], row[1])
+| %s
+| %s
+| %s""" % (row[0], row[0], row[1], row[2], row[3])
     output.append(table_row)
-    total += int(row[1])
+    open_total += int(row[1])
+    open_mediawiki += int(row[2])
+    open_core += int(row[3])
 
 wiki = wikitools.Wiki(config.get('gerrit-reports', 'wiki_api_url'))
 wiki.login(config.get('gerrit-reports', 'wiki_username'),
@@ -60,7 +72,7 @@ report = wikitools.Page(wiki, report_title)
 report_text = report_template % (config.get('gerrit-reports',
                                             'wiki_header_template'),
                                  '\n'.join(output),
-                                 total,
+                                 open_total, open_mediawiki, open_core,
                                  config.get('gerrit-reports',
                                             'wiki_footer_template'))
 report_text = report_text.encode('utf-8')
