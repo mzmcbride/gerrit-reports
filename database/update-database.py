@@ -80,15 +80,15 @@ for change in total_changes:
      gc_updated,
      gc_owner)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-    ''' , (change[u'_number'],
-           change[u'change_id'],
-           change[u'project'],
-           change[u'branch'],
-           change[u'status'],
-           change[u'subject'],
-           change[u'created'],
-           change[u'updated'],
-           change[u'owner'][u'name']))
+    ''', (change[u'_number'],
+          change[u'change_id'],
+          change[u'project'],
+          change[u'branch'],
+          change[u'status'],
+          change[u'subject'],
+          change[u'created'],
+          change[u'updated'],
+          change[u'owner'][u'name']))
 
 cursor.close()
 conn.commit()
