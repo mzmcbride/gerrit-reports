@@ -1,7 +1,7 @@
 # Sample cron file
 
 HOME=/path/to/home
-PYTHONPATH=/path/to/some/package/directories
+PYTHONPATH=/paths/to/package/directories
 0 0 * * * python $HOME/Documents/Git/gerrit-reports/database/update-database.py
 10 0 * * * python $HOME/Documents/Git/gerrit-reports/reports/changesets-by-status.py
 15 0 * * * python $HOME/Documents/Git/gerrit-reports/reports/oldest-open-changesets.py

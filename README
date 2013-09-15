@@ -7,4 +7,9 @@ Dependencies:
 Fill out the gerrit-reports.ini.sample file appropriately and move it to the
 equivalent of os.path.expanduser('~') with the name ".gerrit-reports.ini".
 
+You'll need to do a manual one-time run of "create-database.py". All the other
+relevant commands are in crontab.txt.
+
 License information is available in the LICENSE file.
+
+Enjoy!
