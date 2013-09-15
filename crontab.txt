@@ -1,0 +1,12 @@
+# Sample cron file
+
+HOME=/path/to/home
+PYTHONPATH=/path/to/some/package/directories
+0 6 * * * python $HOME/Documents/Sites/leaseweb/generate-hitshit.py; python $HOME/Documents/Sites/leaseweb/upload-hitshit.py
+0 0 * * * python $HOME/Documents/Git/gerrit-reports/database/update-database.py
+10 0 * * * python $HOME/Documents/Git/gerrit-reports/reports/changesets-by-status.py
+15 0 * * * python $HOME/Documents/Git/gerrit-reports/reports/oldest-open-changesets.py
+20 0 * * * python $HOME/Documents/Git/gerrit-reports/reports/open-changesets-by-owner.py
+25 0 * * * python $HOME/Documents/Git/gerrit-reports/reports/merged-changesets-wed-to-unresolved-bugs.py
+30 0 * * * python $HOME/Documents/Git/gerrit-reports/reports/changesets-by-project.py
+35 0 * * * python $HOME/Documents/Git/gerrit-reports/reports/open-changesets-by-owner-newbie.py
