@@ -8,9 +8,9 @@ gerrit_api_url = https://gerrit.wikimedia.org/r/
 
 # Wiki details
 wiki_api_url = https://www.mediawiki.org/w/api.php
-wiki_username = Sample username
-wiki_password = Sample password
-wiki_root_page = Wiki/Root/Page/
-wiki_edit_summary = Edit summary
+wiki_username = Username
+wiki_password = Password
+wiki_root_page = Gerrit/Reports/
+wiki_edit_summary = Testing...
 wiki_header_template = {{gerrit reports header}}
 wiki_footer_template = {{gerrit reports footer}}
