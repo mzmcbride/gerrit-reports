@@ -45,12 +45,12 @@ SELECT
   SUM( gc_project == 'mediawiki/core' ) as open_core
 FROM changesets
 WHERE gc_status = 'NEW'
-AND gc_owner IN (
+AND gc_owner NOT IN (
   SELECT gc_owner
   FROM changesets
   WHERE gc_status = 'MERGED'
   GROUP BY gc_owner
-  HAVING COUNT( gc_owner ) < 5
+  HAVING COUNT( gc_owner ) >= 5
 )
 GROUP BY gc_owner;
 ''')
