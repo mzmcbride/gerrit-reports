@@ -14,8 +14,8 @@ database_name = config.get('gerrit-reports', 'database_name')
 gerrit_api_url = config.get('gerrit-reports', 'gerrit_api_url')
 
 def get_changes(gerrit_api_url, status, sortkey):
+    next_iteration_sortkey = None
     changes = []
-    more_changes = False
     if sortkey:
         sortkey_param = '+sortkey_before:%s' % sortkey
     else:
@@ -24,34 +24,27 @@ def get_changes(gerrit_api_url, status, sortkey):
     opener = urllib2.build_opener()
     # Set a user agent to avoid an "Authentication required" error
     opener.addheaders = [('User-Agent', 'gerrit-reports')]
-    url_contents = opener.open(gerrit_api_url+'changes/' + params).read()
+    url = gerrit_api_url+'changes/'+params
+    url_contents = opener.open(url).read()
     # Strip first five bytes to avoid an XSSI protection
     valid_json = url_contents[5:]
     loaded_json = json.loads(valid_json)
-    for i in loaded_json:
-        try:
-            i['_more_changes']
-            more_changes = True
-            sortkey = i['_sortkey']
-        except KeyError:
-            pass
-        changes.append(i)
-    return changes, sortkey
+    for item in loaded_json:
+        if '_more_changes' in item:
+            next_iteration_sortkey = item['_sortkey']
+        changes.append(item)
+    return changes, next_iteration_sortkey
 
 def get_cumulative_changes(gerrit_api_url, status):
-    sortkey = ''
-    sortkeys = []
+    sortkey = None
     cumulative_changes = []
     while True:
-        changes, sortkey = get_changes(gerrit_api_url, status, sortkey)
+        changes, returned_sortkey = get_changes(gerrit_api_url, status, sortkey)
         cumulative_changes += changes
-        if sortkey in sortkeys:
-            break
-        if not changes:
+        if not returned_sortkey:
             break
         else:
-            sortkey = sortkey
-            sortkeys.append(sortkey)
+            sortkey = returned_sortkey
     return cumulative_changes
 
 total_changes = []
@@ -68,7 +61,8 @@ conn = sqlite3.connect(database_name)
 cursor = conn.cursor()
 
 for change in total_changes:
-    cursor.execute('''
+    try:
+        cursor.execute('''
     INSERT OR REPLACE INTO changesets
     (gc_number,
      gc_change_id,
@@ -89,6 +83,8 @@ for change in total_changes:
           change[u'created'],
           change[u'updated'],
           change[u'owner'][u'name']))
+    except KeyError:
+        print(repr(change))
 
 cursor.close()
 conn.commit()
