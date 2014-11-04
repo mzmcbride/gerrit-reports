@@ -23,6 +23,7 @@ report_template = u'''\
 ! Changeset
 ! Project
 ! Created
+! Updated
 ! Owner
 %s
 |}
@@ -37,6 +38,7 @@ SELECT
   gc_number,
   gc_project,
   gc_created,
+  gc_updated,
   gc_owner
 FROM changesets
 WHERE gc_status = 'NEW'
@@ -51,7 +53,7 @@ for row in cursor.fetchall():
 | [[gerrit:%s|%s]]
 | %s
 | %s
-| %s""" % (row[0], row[0], row[1], row[2].split(' ', 1)[0], row[3])
+| %s""" % (row[0], row[0], row[1], row[2].split(' ', 1)[0], row[3].split(' ', 1)[0], row[4])
     output.append(table_row)
 
 wiki = wikitools.Wiki(config.get('gerrit-reports', 'wiki_api_url'))
