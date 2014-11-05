@@ -53,6 +53,7 @@ for row in cursor.fetchall():
 | [[gerrit:%s|%s]]
 | %s
 | %s
+| %s
 | %s""" % (row[0], row[0], row[1], row[2].split(' ', 1)[0], row[3].split(' ', 1)[0], row[4])
     output.append(table_row)
 
