@@ -13,6 +13,14 @@ wiki_api_url = config.get('gerrit-reports', 'wiki_api_url')
 root_page = config.get('gerrit-reports', 'wiki_root_page')
 
 report_title = root_page + 'Code review activity'
+report_template = u'''\
+%s
+
+<pre>
+%s
+</pre>
+
+%s'''
 
 output = os.system('curl -s ' + \
          # Fetch the logs of the gerrit and wikibugs feed
@@ -56,7 +64,7 @@ wiki.login(config.get('gerrit-reports', 'wiki_username'),
 report = wikitools.Page(wiki, report_title)
 report_text = report_template % (config.get('gerrit-reports',
                                             'wiki_header_template'),
-                                 '\n'.join(output),
+                                 output,
                                  config.get('gerrit-reports',
                                             'wiki_footer_template'))
 report_text = report_text.encode('utf-8')
