@@ -7,6 +7,13 @@ import os
 import sqlite3
 import urllib2
 
+statuses = ['abandoned',
+            'closed',
+            'merged',
+            'open',
+            'reviewed',
+            'submitted']
+
 config = ConfigParser.ConfigParser()
 config.read([os.path.expanduser('~/.gerrit-reports.ini')])
 
@@ -20,7 +27,7 @@ def get_changes(gerrit_api_url, status, sortkey):
         sortkey_param = '+sortkey_before:%s' % sortkey
     else:
         sortkey_param = ''
-    params = '?q=status:%s' % status + sortkey_param+'&n=500'
+    params = '?q=status:%s' % status + sortkey_param+'&n=500&o=LABELS'
     opener = urllib2.build_opener()
     # Set a user agent to avoid an "Authentication required" error
     opener.addheaders = [('User-Agent', 'gerrit-reports')]
@@ -35,57 +42,54 @@ def get_changes(gerrit_api_url, status, sortkey):
         changes.append(item)
     return changes, next_iteration_sortkey
 
-def get_cumulative_changes(gerrit_api_url, status):
+def write_changes(database_name, changes):
+    conn = sqlite3.connect(database_name)
+    cursor = conn.cursor()
+
+    for change in changes:
+        try:
+            label = change[u'labels'][u'Code-Review'][u'value']
+        except:
+            label = 0
+
+        try:
+            cursor.execute('''
+        INSERT OR REPLACE INTO changesets
+        (gc_number,
+         gc_change_id,
+         gc_project,
+         gc_branch,
+         gc_status,
+         gc_subject,
+         gc_created,
+         gc_updated,
+         gc_owner,
+         gc_labels)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+        ''', (change[u'_number'],
+              change[u'change_id'],
+              change[u'project'],
+              change[u'branch'],
+              change[u'status'],
+              change[u'subject'],
+              change[u'created'],
+              change[u'updated'],
+              change[u'owner'][u'name'],
+              label))
+        except KeyError:
+            print(repr(change))
+
+    cursor.close()
+    conn.commit()
+    conn.close()
+    return
+
+for status in statuses:
     sortkey = None
-    cumulative_changes = []
     while True:
         changes, returned_sortkey = get_changes(gerrit_api_url, status, sortkey)
-        cumulative_changes += changes
+        write_changes(database_name, changes)
         if not returned_sortkey:
             break
         else:
             sortkey = returned_sortkey
-    return cumulative_changes
-
-total_changes = []
-for status in ['abandoned',
-               'closed',
-               'merged',
-               'open',
-               'reviewed',
-               'submitted']:
-    cumulative_changes = get_cumulative_changes(gerrit_api_url, status)
-    total_changes += cumulative_changes
-
-conn = sqlite3.connect(database_name)
-cursor = conn.cursor()
-
-for change in total_changes:
-    try:
-        cursor.execute('''
-    INSERT OR REPLACE INTO changesets
-    (gc_number,
-     gc_change_id,
-     gc_project,
-     gc_branch,
-     gc_status,
-     gc_subject,
-     gc_created,
-     gc_updated,
-     gc_owner)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
-    ''', (change[u'_number'],
-          change[u'change_id'],
-          change[u'project'],
-          change[u'branch'],
-          change[u'status'],
-          change[u'subject'],
-          change[u'created'],
-          change[u'updated'],
-          change[u'owner'][u'name']))
-    except KeyError:
-        print(repr(change))
-
-cursor.close()
-conn.commit()
-conn.close()

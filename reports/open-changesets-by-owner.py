@@ -24,9 +24,11 @@ report_template = u'''\
 ! Changesets<br>(total)
 ! Changesets<br>(mediawiki/*)
 ! Changesets<br>(mediawiki/core)
+! Changesets<br>(CR >= 0)
 %s
 |- class="sortbottom"
 ! Total
+! %s
 ! %s
 ! %s
 ! %s
@@ -43,6 +45,7 @@ SELECT
   COUNT(*) as open_total,
   SUM( gc_project LIKE 'mediawiki/%' ) as open_mediawiki,
   SUM( gc_project == 'mediawiki/core' ) as open_core
+  SUM( gc_labels > -1 ) as open_unreviewed
 FROM changesets
 WHERE gc_status = 'NEW'
 GROUP BY gc_owner;
@@ -52,6 +55,7 @@ output = []
 open_total = 0
 open_mediawiki = 0
 open_core = 0
+open_unreviewed = 0
 for row in cursor.fetchall():
     table_row = u"""
 |-
@@ -59,14 +63,17 @@ for row in cursor.fetchall():
 | [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" status:open}},n,z %s]
 | [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:^mediawiki/.+ status:open}},n,z %s]
 | [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:mediawiki/core status:open}},n,z %s]
+| [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" status:open label:Code-Review>=0}},n,z %s]
 """.strip() % (row[0],
                row[0], row[1],
                row[0], row[2],
-               row[0], row[3])
+               row[0], row[3],
+               row[0], row[4])
     output.append(table_row)
     open_total += int(row[1])
     open_mediawiki += int(row[2])
     open_core += int(row[3])
+    open_unreviewed += int(row[4])
 
 wiki = wikitools.Wiki(config.get('gerrit-reports', 'wiki_api_url'))
 wiki.login(config.get('gerrit-reports', 'wiki_username'),
@@ -76,7 +83,7 @@ report = wikitools.Page(wiki, report_title)
 report_text = report_template % (config.get('gerrit-reports',
                                             'wiki_header_template'),
                                  '\n'.join(output),
-                                 open_total, open_mediawiki, open_core,
+                                 open_total, open_mediawiki, open_core, open_unreviewed
                                  config.get('gerrit-reports',
                                             'wiki_footer_template'))
 report_text = report_text.encode('utf-8')

@@ -22,7 +22,8 @@ CREATE TABLE changesets (
   gc_subject text,
   gc_created text,
   gc_updated text,
-  gc_owner text
+  gc_owner text,
+  gc_labels integer
 );
 ''')
 cursor.close()
