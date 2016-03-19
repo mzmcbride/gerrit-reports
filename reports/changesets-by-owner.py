@@ -55,7 +55,7 @@ open_core = 0
 for row in cursor.fetchall():
     table_row = u"""
 |-
-| %s
+| <span id="%s">%s</span>
 | [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s"}},n,z %s]
 | [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:^mediawiki/.+ status:open}},n,z %s]
 | [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:mediawiki/core status:open}},n,z %s]
