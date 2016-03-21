@@ -57,8 +57,8 @@ for row in cursor.fetchall():
 |-
 | <span id="{{anchorencode:%s}}">%s</span>
 | [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s"}},n,z %s]
-| [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:^mediawiki/.+ status:open}},n,z %s]
-| [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:mediawiki/core status:open}},n,z %s]
+| [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:^mediawiki/.+}},n,z %s]
+| [https://gerrit.wikimedia.org/r/#/q/{{urlencode:owner:"%s" project:mediawiki/core}},n,z %s]
 """.strip() % (row[0], row[0],
                row[0], row[1],
                row[0], row[2],
