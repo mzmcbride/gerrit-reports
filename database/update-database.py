@@ -21,10 +21,9 @@ database_name = config.get('gerrit-reports', 'database_name')
 gerrit_api_url = config.get('gerrit-reports', 'gerrit_api_url')
 
 def get_changes(gerrit_api_url, status, sortkey):
-    next_iteration_sortkey = None
     changes = []
     if sortkey:
-        sortkey_param = '+sortkey_before:%s' % sortkey
+        sortkey_param = '&start=%d' % (sortkey * 500)
     else:
         sortkey_param = ''
     params = '?q=status:%s' % status + sortkey_param+'&n=500&o=LABELS'
@@ -38,7 +37,9 @@ def get_changes(gerrit_api_url, status, sortkey):
     loaded_json = json.loads(valid_json)
     for item in loaded_json:
         if '_more_changes' in item:
-            next_iteration_sortkey = item['_sortkey']
+            next_iteration_sortkey += 1
+        else:
+            next_iteration_sortkey = False
         changes.append(item)
     return changes, next_iteration_sortkey
 
@@ -85,7 +86,7 @@ def write_changes(database_name, changes):
     return
 
 for status in statuses:
-    sortkey = None
+    sortkey = False
     while True:
         changes, returned_sortkey = get_changes(gerrit_api_url, status, sortkey)
         write_changes(database_name, changes)
