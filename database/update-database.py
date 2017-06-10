@@ -26,7 +26,7 @@ def get_changes(gerrit_api_url, status, sortkey):
         sortkey_param = '&start=%d' % (sortkey * 500)
     else:
         sortkey_param = ''
-    params = '?q=status:%s' % status + sortkey_param+'&n=500&o=LABELS'
+    params = '?q=status:%s' % status + sortkey_param+'&n=500&o=LABELS&o=DETAILED_ACCOUNTS'
     opener = urllib2.build_opener()
     # Set a user agent to avoid an "Authentication required" error
     opener.addheaders = [('User-Agent', 'gerrit-reports')]
@@ -37,7 +37,7 @@ def get_changes(gerrit_api_url, status, sortkey):
     loaded_json = json.loads(valid_json)
     for item in loaded_json:
         if '_more_changes' in item:
-            next_iteration_sortkey += 1
+            next_iteration_sortkey = sortkey + 1
         else:
             next_iteration_sortkey = False
         changes.append(item)
@@ -86,7 +86,7 @@ def write_changes(database_name, changes):
     return
 
 for status in statuses:
-    sortkey = False
+    sortkey = 0
     while True:
         changes, returned_sortkey = get_changes(gerrit_api_url, status, sortkey)
         write_changes(database_name, changes)
