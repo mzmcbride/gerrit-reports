@@ -1,4 +1,10 @@
 Gerrit reports.
+Download and query activity data from a [Gerrit code review](https://www.gerritcodereview.com/) server, using its API and a local sqlite database.
+Publish some reports as informative tables with links, on a MediaWiki wiki page.
+
+Currently tailored for [Wikimedia gerrit](http://gerrit.wikimedia.org/): see [example output on mediawiki.org](https://www.mediawiki.org/wiki/Gerrit/Reports).
+
+# Requirements
 
 Dependencies:
 * Python
@@ -10,6 +16,10 @@ equivalent of os.path.expanduser('~') with the name ".gerrit-reports.ini".
 You'll need to do a manual one-time run of "create-database.py". All the other
 relevant commands are in crontab.txt.
 
+# Other
+
 License information is available in the LICENSE file.
+
+Currently, data updates are not incremental: every update downloads data about all changesets from the API, even though the local database may not need to be updated.
 
 Enjoy!
